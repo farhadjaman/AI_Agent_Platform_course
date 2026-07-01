@@ -1,0 +1,6 @@
+[project]
+name = "minimal-agent"
+version = "0.1.0"
+dependencies = [
+    "google-adk==1.33.0",
+]
