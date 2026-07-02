@@ -2,6 +2,8 @@ from google.adk.agents import LlmAgent
 from google.adk.tools.bigquery import BigQueryToolset
 
 from .tools import get_my_gcp_project_info
+from .shared_libraries import fix_billing_project, truncate_large_responses
+
 
 
 bigquery_toolset = BigQueryToolset()
@@ -21,4 +23,7 @@ root_agent = LlmAgent(
         "the data resides."
     ),
     tools=[get_my_gcp_project_info, bigquery_toolset],
+    before_tool_callback=fix_billing_project,
+    after_tool_callback=truncate_large_responses,
+
 )
