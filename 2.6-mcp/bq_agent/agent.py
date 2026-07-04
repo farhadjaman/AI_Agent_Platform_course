@@ -1,12 +1,34 @@
+import google.auth
+
 from google.adk.agents import LlmAgent
-from google.adk.tools.bigquery import BigQueryToolset
+from google.adk.tools.mcp_tool import McpToolset
+from google.adk.tools.mcp_tool.mcp_session_manager import StreamableHTTPConnectionParams
+from google.auth.transport.requests import Request
 
 from .tools import get_my_gcp_project_info
 from .shared_libraries.callbacks import fix_billing_project, truncate_large_responses
 
 
-bigquery_toolset = BigQueryToolset()
+def get_auth_headers() -> dict[str, str]:
+    """Fetch auth headers for the managed MCP endpoint."""
+    credentials, _ = google.auth.default(
+        scopes=["https://www.googleapis.com/auth/cloud-platform"]
+    )
+    credentials.refresh(Request())
+    return {"Authorization": f"Bearer {credentials.token}"}
 
+
+mcp_headers = {
+    "Content-Type": "application/json",
+    "Accept": "application/json, text/event-stream",
+} | get_auth_headers()
+
+bigquery_mcp_toolset = McpToolset(
+    connection_params=StreamableHTTPConnectionParams(
+        url="https://bigquery.googleapis.com/mcp",
+        headers=mcp_headers,
+    )
+)
 
 root_agent = LlmAgent(
     model="gemini-2.5-flash",
@@ -21,7 +43,7 @@ root_agent = LlmAgent(
         "project you would run the query in, even though it is the project where "
         "the data resides."
     ),
-    tools=[get_my_gcp_project_info, bigquery_toolset],
+    tools=[get_my_gcp_project_info, bigquery_mcp_toolset],
     before_tool_callback=fix_billing_project,
     after_tool_callback=truncate_large_responses,
 )
