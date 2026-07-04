@@ -1,0 +1,7 @@
+[project]
+name = "alphabet-analyst"
+version = "0.1.0"
+dependencies = [
+    "google-adk==1.33.0",
+    "google-cloud-aiplatform==1.153.1",
+]
