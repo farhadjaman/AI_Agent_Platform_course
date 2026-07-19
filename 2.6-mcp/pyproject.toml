@@ -3,5 +3,7 @@ name = "bigquery-agent"
 version = "0.1.0"
 dependencies = [
     "google-adk==1.33.0",
+    "google-cloud-aiplatform==1.153.1",
     "google-cloud-resource-manager==1.14.0",
+    "mcp==1.27.0",
 ]
