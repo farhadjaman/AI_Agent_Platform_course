@@ -5,6 +5,7 @@ from google.adk.agents.readonly_context import ReadonlyContext
 from google.adk.tools.mcp_tool import McpToolset
 from google.adk.tools.mcp_tool.mcp_session_manager import StreamableHTTPConnectionParams
 from google.auth.transport.requests import Request
+from google.adk.tools.preload_memory_tool import PreloadMemoryTool
 
 from .tools import get_my_gcp_project_info
 from .shared_libraries.callbacks import fix_billing_project, truncate_large_responses
@@ -37,7 +38,7 @@ bigquery_mcp_toolset = McpToolset(
 )
 
 root_agent = LlmAgent(
-    model="gemini-2.5-flash",
+    model="gemini-3.5-flash",
     name="bq_agent",
     instruction=(
         "You are a helpful assistant with access to information about the user's "
@@ -49,7 +50,7 @@ root_agent = LlmAgent(
         "project you would run the query in, even though it is the project where "
         "the data resides."
     ),
-    tools=[get_my_gcp_project_info, bigquery_mcp_toolset],
+    tools=[get_my_gcp_project_info, bigquery_mcp_toolset, PreloadMemoryTool()],
     before_tool_callback=fix_billing_project,
     after_tool_callback=truncate_large_responses,
 )
